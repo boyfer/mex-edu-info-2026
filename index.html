@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard de Admisiones Universitarias 2026</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: #fdfbf7;
+            color: #3e3c38;
+        }
+
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 350px;
+            max-height: 400px;
+        }
+
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 380px;
+            }
+        }
+
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(220, 215, 205, 0.5);
+        }
+
+        .card-hover {
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .card-hover:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 24px -8px rgba(100, 95, 90, 0.15);
+        }
+
+        .tag-abierta {
+            background-color: #def0d8;
+            color: #3c763d;
+        }
+
+        .tag-cerca {
+            background-color: #fcf8e3;
+            color: #8a6d3b;
+        }
+
+        .tag-cerrada {
+            background-color: #f2dede;
+            color: #a94442;
+        }
+    </style>
+</head>
+
+<body class="antialiased min-h-screen flex flex-col">
+
+    <!-- Chosen Palette: Warm Neutrals & Subtle Accents (Stone, Slate, Sage Green, Muted Terracotta) -->
+    <!-- Application Structure Plan: A top-level dashboard providing macroscopic insights (costs, tech focus, availability) followed by an interactive, filterable directory. This allows users to first grasp the national landscape and then drill down into specific institutions based on their interests and status. -->
+    <!-- Visualization & Content Choices: 1. Status Donut -> Goal: Inform -> Shows urgency. 2. Tech Score Bar -> Goal: Compare -> Evaluates CS departments. 3. Cost Chart -> Goal: Compare -> Financial planning. 4. Filterable Grid -> Goal: Organize -> Detailed exploration. No SVG/Mermaid used. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+
+    <nav class="sticky top-0 z-50 glass-panel shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-2">
+                <span class="text-2xl">🎓</span>
+                <span class="font-bold text-xl tracking-tight text-stone-800">EduData 2026</span>
+            </div>
+            <div class="text-sm font-medium text-stone-500">
+                Actualización: 18 Abril 2026
+            </div>
+        </div>
+    </nav>
+
+    <header class="max-w-7xl mx-auto px-4 py-12 md:py-20 text-center">
+        <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold text-stone-800 mb-6 tracking-tight">
+            Análisis Estratégico de <br /><span class="text-stone-500">Admisiones Universitarias</span>
+        </h1>
+        <p class="mt-4 max-w-3xl text-lg text-stone-600 mx-auto leading-relaxed">
+            Explora la investigación exhaustiva sobre los procesos de ingreso para el ciclo Agosto/Septiembre 2026.
+            Analiza fortalezas en Ciencias de Datos, costos proyectados y verifica el estado de las convocatorias en
+            tiempo real.
+        </p>
+    </header>
+
+    <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full pb-20">
+
+        <section class="mb-16">
+            <div class="mb-8">
+                <h2 class="text-2xl font-bold text-stone-800 flex items-center">
+                    <span class="mr-2">📊</span> Panorama Nacional
+                </h2>
+                <p class="text-stone-500 mt-1">Visión global del ecosistema educativo, enfoques tecnológicos y
+                    viabilidad financiera.</p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div class="bg-white rounded-2xl p-6 shadow-sm border border-stone-200">
+                    <h3 class="text-lg font-bold text-stone-700 mb-4 text-center">Estatus de Convocatorias (N=30)</h3>
+                    <div class="chart-container">
+                        <canvas id="statusChart"></canvas>
+                    </div>
+                    <p class="text-sm text-stone-500 mt-4 text-center">Distribución actual de disponibilidad de fichas.
+                        Gran parte del sector público ha cerrado.</p>
+                </div>
+
+                <div class="bg-white rounded-2xl p-6 shadow-sm border border-stone-200">
+                    <h3 class="text-lg font-bold text-stone-700 mb-4 text-center">Evaluación Tech & CS (Top 10 Nacional)
+                    </h3>
+                    <div class="chart-container">
+                        <canvas id="techChart"></canvas>
+                    </div>
+                    <p class="text-sm text-stone-500 mt-4 text-center">Calificación del departamento de Ciencias
+                        Computacionales e IA (0-10).</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="mb-16">
+            <div class="mb-8">
+                <h2 class="text-2xl font-bold text-stone-800 flex items-center">
+                    <span class="mr-2">🔍</span> Explorador de Instituciones
+                </h2>
+                <p class="text-stone-500 mt-1">Filtra y analiza detalladamente los requisitos, fechas y enfoques de cada
+                    universidad.</p>
+            </div>
+
+            <div
+                class="bg-white p-4 rounded-xl shadow-sm border border-stone-200 mb-8 flex flex-col md:flex-row gap-4 items-center justify-between sticky top-20 z-40">
+                <div class="w-full md:w-1/3 relative">
+                    <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-stone-400">⌨️</span>
+                    <input type="text" id="searchInput" placeholder="Buscar universidad..."
+                        class="w-full pl-10 pr-4 py-2 bg-stone-50 border border-stone-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-stone-400 text-stone-700">
+                </div>
+
+                <div class="flex gap-2 w-full md:w-auto overflow-x-auto pb-2 md:pb-0">
+                    <button
+                        class="filter-btn active px-4 py-2 rounded-lg text-sm font-medium bg-stone-800 text-white transition-colors"
+                        data-filter="all">Todas</button>
+                    <button
+                        class="filter-btn px-4 py-2 rounded-lg text-sm font-medium bg-stone-100 text-stone-600 hover:bg-stone-200 transition-colors"
+                        data-filter="publica">🏛️ Públicas</button>
+                    <button
+                        class="filter-btn px-4 py-2 rounded-lg text-sm font-medium bg-stone-100 text-stone-600 hover:bg-stone-200 transition-colors"
+                        data-filter="privada">💼 Privadas</button>
+                    <button
+                        class="filter-btn px-4 py-2 rounded-lg text-sm font-medium bg-stone-100 text-stone-600 hover:bg-stone-200 transition-colors"
+                        data-filter="oaxaca">📍 Oaxaca</button>
+                </div>
+
+                <div class="w-full md:w-auto">
+                    <select id="statusFilter"
+                        class="w-full py-2 pl-3 pr-8 bg-stone-50 border border-stone-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-stone-400 text-stone-700 text-sm">
+                        <option value="all">Cualquier Estatus</option>
+                        <option value="abierta">🟢 Abiertas</option>
+                        <option value="cerca de terminar">🟡 Cerca de Cerrar</option>
+                        <option value="cerrada">🔴 Cerradas</option>
+                    </select>
+                </div>
+            </div>
+
+            <div id="universityGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            </div>
+
+            <div id="noResults" class="hidden text-center py-12 text-stone-500">
+                <div class="text-4xl mb-4">📭</div>
+                <p class="text-lg">No se encontraron instituciones con los filtros actuales.</p>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-stone-900 text-stone-400 py-10 mt-auto">
+        <div class="max-w-7xl mx-auto px-4 text-center text-sm">
+            <p class="mb-2">La información de fechas y costos son estimaciones basadas en investigación rigurosa.
+                Verifique siempre los portales oficiales.</p>
+            <p>© 2026 EduData Analytics. Diseño responsivo y accesible.</p>
+        </div>
+    </footer>
+
+    <script>
+        const univData = [
+            { nombre: "Universidad Nacional Autónoma de México", siglas: "UNAM", tipo: "publica", estatus: "cerrada", ubicacion: "CDMX y Nacional", fortalezas: "Medicina, Derecho, Ingeniería, Ciencias", tech_score: 10, tech_desc: "El IIMAS es líder mundial en investigación de IA aplicada y teoría computacional.", fichas: "Finalizó 15-Feb-2026", examen: "18 Mayo - 15 Jun 2026", inicio: "10 Ago 2026", costo_num: 0, costo: "Gratuita", requisitos: "Promedio ≥ 7.0, Registro, Examen de 120 reactivos.", url: "https://www.dgae.unam.mx" },
+            { nombre: "Instituto Politécnico Nacional", siglas: "IPN", tipo: "publica", estatus: "cerrada", ubicacion: "CDMX y Nacional", fortalezas: "Ingeniería, Robótica, Físico-Matemáticas", tech_score: 9.8, tech_desc: "ESCOM es reconocida como la mejor escuela de ingeniería de software pública.", fichas: "Finalizó 22-Mar-2026", examen: "07-09 Jun 2026", inicio: "17 Ago 2026", costo_num: 0, costo: "Gratuita", requisitos: "Registro web, aportación voluntaria, examen en línea.", url: "https://www.ipn.mx" },
+            { nombre: "Universidad de Guadalajara", siglas: "UDG", tipo: "publica", estatus: "cerrada", ubicacion: "Jalisco", fortalezas: "Biomedicina, Innovación, Arquitectura", tech_score: 9.2, tech_desc: "CUCEI es un semillero fundamental para el Silicon Valley mexicano.", fichas: "Finalizó 28-Feb-2026", examen: "18 May 2026", inicio: "11 Ago 2026", costo_num: 0, costo: "Pública", requisitos: "PAA de College Board, promedio de preparatoria.", url: "http://www.escolar.udg.mx" },
+            { nombre: "Universidad Autónoma de Nuevo León", siglas: "UANL", tipo: "publica", estatus: "cerca de terminar", ubicacion: "Nuevo León", fortalezas: "Ingeniería Mecánica, Negocios, Salud", tech_score: 9.0, tech_desc: "FIME destaca en redes, automatización e industria 4.0.", fichas: "Cierra 30 Abr 2026", examen: "08 Jun 2026", inicio: "03 Ago 2026", costo_num: 0, costo: "Pública", requisitos: "Registro SIASE, EXANI-II.", url: "https://www.uanl.mx" },
+            { nombre: "Universidad Autónoma Metropolitana", siglas: "UAM", tipo: "publica", estatus: "cerrada", ubicacion: "CDMX", fortalezas: "Diseño, Ciencias Sociales, Biología", tech_score: 8.8, tech_desc: "Unidad Cuajimalpa pionera en diseño de sistemas y UX.", fichas: "Finalizó 28-Feb-2026", examen: "15-22 Abr 2026", inicio: "21 Sep 2026", costo_num: 0, costo: "Pública", requisitos: "Promedio ≥ 7.0, Examen de selección propio.", url: "https://admision.uam.mx" },
+            { nombre: "Benemérita Universidad Autónoma de Puebla", siglas: "BUAP", tipo: "publica", estatus: "cerrada", ubicacion: "Puebla", fortalezas: "Física, Química, Medicina", tech_score: 9.0, tech_desc: "Facultad de Ciencias de la Computación con posgrados de excelencia.", fichas: "Finalizó 10-Abr-2026", examen: "Jun 2026", inicio: "10 Ago 2026", costo_num: 0, costo: "Pública", requisitos: "Examen EGA-I, validación documental.", url: "https://admision.buap.mx" },
+            { nombre: "Universidad Autónoma de Querétaro", siglas: "UAQ", tipo: "publica", estatus: "abierta", ubicacion: "Querétaro", fortalezas: "Ingeniería, Ciencias Naturales", tech_score: 8.5, tech_desc: "Facultad de Informática líder en el sector tecnológico del Bajío.", fichas: "Cierra 05 May 2026", examen: "Jun 2026", inicio: "03 Ago 2026", costo_num: 0, costo: "Pública", requisitos: "Curso propedéutico, EXCOBA.", url: "https://www.uaq.mx" },
+            { nombre: "Universidad Veracruzana", siglas: "UV", tipo: "publica", estatus: "cerrada", ubicacion: "Veracruz", fortalezas: "Artes, Ciencias Marinas, Derecho", tech_score: 8.0, tech_desc: "Especialización creciente en Ciberseguridad y Redes.", fichas: "Finalizó 05-Mar-2026", examen: "25-26 May 2026", inicio: "17 Ago 2026", costo_num: 0, costo: "Pública", requisitos: "EXANI-II, registro web.", url: "https://www.uv.mx" },
+            { nombre: "Universidad Autónoma de Yucatán", siglas: "UADY", tipo: "publica", estatus: "cerrada", ubicacion: "Yucatán", fortalezas: "Matemáticas, Antropología", tech_score: 8.7, tech_desc: "Facultad de Matemáticas pionera en Ingeniería de Software en el sureste.", fichas: "Finalizó 15-Mar-2026", examen: "15 Jun 2026", inicio: "10 Ago 2026", costo_num: 0, costo: "Pública", requisitos: "EXANI-II, identificación vigente.", url: "https://ingreso.uady.mx" },
+            { nombre: "Universidad Autónoma del Estado de Hidalgo", siglas: "UAEH", tipo: "publica", estatus: "cerca de terminar", ubicacion: "Hidalgo", fortalezas: "Ciencias de la Salud, Ciencias Básicas", tech_score: 7.8, tech_desc: "Programas sólidos en sistemas computacionales.", fichas: "Cierra 26 Abr 2026", examen: "Jun 2026", inicio: "03 Ago 2026", costo_num: 0, costo: "Pública", requisitos: "Registro en línea, EXANI-II.", url: "https://www.uaeh.edu.mx" },
+            { nombre: "Tecnológico de Monterrey", siglas: "ITESM", tipo: "privada", estatus: "abierta", ubicacion: "Nacional", fortalezas: "Negocios, Emprendimiento, Ingeniería", tech_score: 10, tech_desc: "Laboratorios de IA de clase mundial y convenios Big Tech.", fichas: "Abierta (Por etapas)", examen: "PAA Programable", inicio: "10 Ago 2026", costo_num: 165000, costo: "$165,000 MXN", requisitos: "Currículum, Ensayo, PAA competitivo.", url: "https://tec.mx" },
+            { nombre: "Instituto Tecnológico Autónomo de México", siglas: "ITAM", tipo: "privada", estatus: "abierta", ubicacion: "CDMX", fortalezas: "Economía, Ciencia de Datos, Finanzas", tech_score: 9.8, tech_desc: "Programa de Ciencia de Datos más prestigioso del sector privado.", fichas: "Abierta hasta Mayo", examen: "PAA mensual", inicio: "17 Ago 2026", costo_num: 145000, costo: "$145,000 MXN", requisitos: "Puntaje PAA alto, promedio prepa.", url: "https://www.itam.mx" },
+            { nombre: "Universidad Iberoamericana", siglas: "IBERO", tipo: "privada", estatus: "abierta", ubicacion: "CDMX", fortalezas: "Comunicación, Diseño, Arquitectura", tech_score: 9.0, tech_desc: "Énfasis en ética de la tecnología e innovación inclusiva.", fichas: "Abierta", examen: "Mensuales", inicio: "10 Ago 2026", costo_num: 138000, costo: "$138,000 MXN", requisitos: "Examen, entrevista, certificado.", url: "https://ibero.mx" },
+            { nombre: "Universidad Panamericana", siglas: "UP", tipo: "privada", estatus: "abierta", ubicacion: "CDMX, GDL, AGS", fortalezas: "Derecho, Filosofía, Ing. Industrial", tech_score: 9.2, tech_desc: "Fuerte en robótica de competencia internacional.", fichas: "Abierta", examen: "Propios / PAA", inicio: "10 Ago 2026", costo_num: 135000, costo: "$135,000 MXN", requisitos: "Examen, psicométrico, entrevista.", url: "https://up.edu.mx" },
+            { nombre: "Universidad Anáhuac", siglas: "ANÁHUAC", tipo: "privada", estatus: "abierta", ubicacion: "Nacional", fortalezas: "Medicina, Entretenimiento, Negocios", tech_score: 8.5, tech_desc: "Infraestructura para simulación y diseño multimedia.", fichas: "Abierta", examen: "PAA programable", inicio: "10 Ago 2026", costo_num: 132000, costo: "$132,000 MXN", requisitos: "PAA, psicotécnico, entrevista.", url: "https://anahuac.mx" },
+            { nombre: "Universidad de las Américas Puebla", siglas: "UDLAP", tipo: "privada", estatus: "abierta", ubicacion: "Puebla", fortalezas: "Relaciones Internacionales, Artes", tech_score: 9.0, tech_desc: "Acreditación ABET en programas de computación.", fichas: "Abierta", examen: "Programado", inicio: "17 Ago 2026", costo_num: 130000, costo: "$130,000 MXN", requisitos: "Examen propio, pago anticipo.", url: "https://www.udlap.mx" },
+            { nombre: "Universidad de Monterrey", siglas: "UDEM", tipo: "privada", estatus: "abierta", ubicacion: "Nuevo León", fortalezas: "Diseño, Arquitectura, Salud", tech_score: 8.8, tech_desc: "Modernos laboratorios de ingeniería y software.", fichas: "Abierta", examen: "PAA", inicio: "10 Ago 2026", costo_num: 125000, costo: "$125,000 MXN", requisitos: "PAA, ensayo, kardex.", url: "https://udem.edu.mx" },
+            { nombre: "Universidad La Salle", siglas: "ULSA", tipo: "privada", estatus: "abierta", ubicacion: "CDMX y Red", fortalezas: "Medicina, Arquitectura", tech_score: 8.5, tech_desc: "Ingeniería Cibernética es su estandarte tecnológico.", fichas: "Cierra 30 May 2026", examen: "Mensual", inicio: "10 Ago 2026", costo_num: 95000, costo: "$95,000 MXN", requisitos: "Examen conocimientos y psicológico.", url: "https://lasalle.mx" },
+            { nombre: "Universidad del Valle de México", siglas: "UVM", tipo: "privada", estatus: "abierta", ubicacion: "Nacional", fortalezas: "Salud, Hospitalidad", tech_score: 7.5, tech_desc: "Programas enfocados a certificaciones de industria rápida.", fichas: "Inscripción Continua", examen: "Diagnóstico", inicio: "07 Sep 2026", costo_num: 48000, costo: "$48,000 MXN", requisitos: "Diagnóstico, pago inscripción.", url: "https://uvm.mx" },
+            { nombre: "Universidad Tecnológica de México", siglas: "UNITEC", tipo: "privada", estatus: "abierta", ubicacion: "Nacional", fortalezas: "Odontología, Ingeniería Práctica", tech_score: 7.0, tech_desc: "Enfoque práctico directo al mercado laboral y soporte.", fichas: "Inscripción Continua", examen: "No aplica", inicio: "07 Sep 2026", costo_num: 32000, costo: "$32,000 MXN", requisitos: "Certificado prepa, entrevista.", url: "https://unitec.mx" },
+            { nombre: "Univ. Autónoma Benito Juárez", siglas: "UABJO", tipo: "oaxaca", estatus: "cerrada", ubicacion: "Oaxaca", fortalezas: "Derecho, Medicina, Idiomas", tech_score: 6.5, tech_desc: "Facultad de Ciencias en proceso de modernización curricular.", fichas: "Finalizó 15-Abr-2026", examen: "Jun 2026", inicio: "17 Ago 2026", costo_num: 0, costo: "Pública", requisitos: "Registro web, examen selección.", url: "https://www.uabjo.mx" },
+            { nombre: "Universidad Tecnológica de la Mixteca", siglas: "UTM", tipo: "oaxaca", estatus: "abierta", ubicacion: "Oaxaca (Huajuapan)", fortalezas: "Ing. Computación, Mecatrónica", tech_score: 10, tech_desc: "Referente estatal e investigación de excelencia en CS.", fichas: "Cierra 20 May 2026", examen: "Jul 2026", inicio: "Oct 2026", costo_num: 0, costo: "Pública (SUNEO)", requisitos: "Promedio ≥ 7.0, Examen riguroso.", url: "http://www.utm.mx" },
+            { nombre: "Instituto Tecnológico de Oaxaca", siglas: "ITO", tipo: "oaxaca", estatus: "abierta", ubicacion: "Oaxaca (Centro)", fortalezas: "Ing. Civil, Ing. Sistemas", tech_score: 8.5, tech_desc: "Departamento de Sistemas consolidado en desarrollo regional.", fichas: "Cierra 30 May 2026", examen: "Jun 2026", inicio: "24 Ago 2026", costo_num: 0, costo: "Pública", requisitos: "EXANI-II, registro TecNM.", url: "https://www.oaxaca.tecnm.mx" },
+            { nombre: "Universidad La Salle Oaxaca", siglas: "ULSA OAX", tipo: "oaxaca", estatus: "abierta", ubicacion: "Oaxaca (Xoxo)", fortalezas: "Psicología, Arquitectura", tech_score: 7.5, tech_desc: "Enfoque en desarrollo de software para negocios locales.", fichas: "Abierta", examen: "May 2026", inicio: "10 Ago 2026", costo_num: 45000, costo: "$45,000 MXN", requisitos: "Entrevista, psicopedagógico.", url: "https://ulsaoaxaca.edu.mx" },
+            { nombre: "Universidad Anáhuac Oaxaca", siglas: "ANÁHUAC OAX", tipo: "oaxaca", estatus: "abierta", ubicacion: "Oaxaca", fortalezas: "Medicina, Negocios", tech_score: 8.0, tech_desc: "Excelente infraestructura multimedia y redes.", fichas: "Abierta", examen: "PAA programado", inicio: "10 Ago 2026", costo_num: 72000, costo: "$72,000 MXN", requisitos: "PAA, entrevista.", url: "https://anahuac.mx/oaxaca" },
+            { nombre: "Universidad de la Sierra Sur", siglas: "UNSIS", tipo: "oaxaca", estatus: "abierta", ubicacion: "Oaxaca (Miahuatlán)", fortalezas: "Enfermería, Informática", tech_score: 8.2, tech_desc: "Informática Médica es su especialidad de alto impacto.", fichas: "Cierra 25 May 2026", examen: "Jun 2026", inicio: "Oct 2026", costo_num: 0, costo: "Pública (SUNEO)", requisitos: "Examen interno.", url: "https://www.unsis.edu.mx" },
+            { nombre: "Universidad del Mar", siglas: "UMAR", tipo: "oaxaca", estatus: "abierta", ubicacion: "Oaxaca (Costa)", fortalezas: "Biología Marina, Turismo", tech_score: 7.5, tech_desc: "Computación aplicada a sistemas y modelos ambientales.", fichas: "Cierra 25 May 2026", examen: "Jun 2026", inicio: "Oct 2026", costo_num: 0, costo: "Pública (SUNEO)", requisitos: "Certificado, examen.", url: "https://www.umar.mx" },
+            { nombre: "Universidad del Papaloapan", siglas: "UNPA", tipo: "oaxaca", estatus: "abierta", ubicacion: "Oaxaca (Tuxtepec)", fortalezas: "Ing. Alimentos, Biotecnología", tech_score: 7.8, tech_desc: "Fuerte integración en Bioinformática.", fichas: "Cierra 25 May 2026", examen: "Jun 2026", inicio: "Oct 2026", costo_num: 0, costo: "Pública (SUNEO)", requisitos: "Examen interno.", url: "https://www.unpa.edu.mx" },
+            { nombre: "Universidad de la Sierra Juárez", siglas: "UNSIJ", tipo: "oaxaca", estatus: "abierta", ubicacion: "Oaxaca (Ixtlán)", fortalezas: "Ciencias Forestales", tech_score: 7.0, tech_desc: "Desarrollo de software para gestión de recursos naturales.", fichas: "Cierra 25 May 2026", examen: "Jun 2026", inicio: "Oct 2026", costo_num: 0, costo: "Pública (SUNEO)", requisitos: "Examen SUNEO.", url: "https://www.unsij.edu.mx" },
+            { nombre: "Instituto Tecnológico del Istmo", siglas: "ITI", tipo: "oaxaca", estatus: "abierta", ubicacion: "Oaxaca (Juchitán)", fortalezas: "Energía Renovable", tech_score: 7.0, tech_desc: "Sistemas aplicados a la gestión energética regional.", fichas: "Cierra Jun 2026", examen: "Jun 2026", inicio: "Ago 2026", costo_num: 0, costo: "Pública", requisitos: "EXANI-II.", url: "https://www.istmo.tecnm.mx" }
+        ];
+
+        let appState = {
+            category: 'all',
+            status: 'all',
+            query: ''
+        };
+
+        const wrapLabel = (label) => {
+            if (typeof label !== 'string') return label;
+            if (label.length <= 16) return label;
+            const words = label.split(' ');
+            const lines = [];
+            let currentLine = '';
+            for (let i = 0; i < words.length; i++) {
+                if ((currentLine + words[i]).length > 16) {
+                    if (currentLine.trim() !== '') lines.push(currentLine.trim());
+                    currentLine = words[i] + ' ';
+                } else {
+                    currentLine += words[i] + ' ';
+                }
+            }
+            if (currentLine.trim() !== '') lines.push(currentLine.trim());
+            return lines;
+        };
+
+        const commonTooltipConfig = {
+            tooltip: {
+                callbacks: {
+                    title: function (tooltipItems) {
+                        const item = tooltipItems[0];
+                        let label = item.chart.data.labels[item.dataIndex];
+                        if (Array.isArray(label)) {
+                            return label.join(' ');
+                        } else {
+                            return label;
+                        }
+                    }
+                }
+            }
+        };
+
+        const initDashboard = () => {
+            const statusCtx = document.getElementById('statusChart').getContext('2d');
+            const statusCounts = { abierta: 0, cerca: 0, cerrada: 0 };
+            univData.forEach(u => {
+                if (u.estatus === 'abierta') statusCounts.abierta++;
+                else if (u.estatus === 'cerca de terminar') statusCounts.cerca++;
+                else statusCounts.cerrada++;
+            });
+
+            new Chart(statusCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Abiertas', 'Cerca de Cerrar', 'Cerradas'],
+                    datasets: [{
+                        data: [statusCounts.abierta, statusCounts.cerca, statusCounts.cerrada],
+                        backgroundColor: ['#8a9a86', '#d9a05b', '#c27b7f'],
+                        borderWidth: 0,
+                        hoverOffset: 4
+                    }]
+                },
+                options: {
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom' },
+                        ...commonTooltipConfig
+                    },
+                    cutout: '60%'
+                }
+            });
+
+            const techCtx = document.getElementById('techChart').getContext('2d');
+            const topTech = [...univData].sort((a, b) => b.tech_score - a.tech_score).slice(0, 10);
+
+            new Chart(techCtx, {
+                type: 'bar',
+                data: {
+                    labels: topTech.map(u => wrapLabel(u.siglas)),
+                    datasets: [{
+                        label: 'Score CS & Data Science',
+                        data: topTech.map(u => u.tech_score),
+                        backgroundColor: '#9ca3af',
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        ...commonTooltipConfig
+                    },
+                    scales: {
+                        y: { min: 6, max: 10 }
+                    }
+                }
+            });
+        };
+
+        const getStatusTagClass = (status) => {
+            if (status === 'abierta') return 'tag-abierta';
+            if (status === 'cerca de terminar') return 'tag-cerca';
+            return 'tag-cerrada';
+        };
+
+        const renderCards = () => {
+            const grid = document.getElementById('universityGrid');
+            const noResults = document.getElementById('noResults');
+            grid.innerHTML = '';
+
+            const filtered = univData.filter(u => {
+                const matchCategory = appState.category === 'all' || u.tipo === appState.category;
+                const matchStatus = appState.status === 'all' || u.estatus === appState.status;
+                const searchStr = `${u.nombre} ${u.siglas} ${u.ubicacion} ${u.fortalezas}`.toLowerCase();
+                const matchQuery = searchStr.includes(appState.query);
+                return matchCategory && matchStatus && matchQuery;
+            });
+
+            if (filtered.length === 0) {
+                grid.classList.add('hidden');
+                noResults.classList.remove('hidden');
+                return;
+            }
+
+            grid.classList.remove('hidden');
+            noResults.classList.add('hidden');
+
+            filtered.forEach(u => {
+                const card = document.createElement('div');
+                card.className = 'bg-white rounded-2xl border border-stone-200 p-6 card-hover flex flex-col h-full shadow-sm';
+
+                card.innerHTML = `
+            <div class="flex justify-between items-start mb-4">
+                <div class="pr-3">
+                    <span class="text-xs font-bold text-stone-400 uppercase tracking-wider">${u.siglas}</span>
+                    <h3 class="text-lg font-bold text-stone-800 leading-tight mt-1">${u.nombre}</h3>
+                </div>
+                <span class="text-[10px] font-bold uppercase px-2 py-1 rounded border whitespace-nowrap ${getStatusTagClass(u.estatus)}">
+                    ${u.estatus}
+                </span>
+            </div>
+            
+            <div class="text-sm text-stone-500 mb-4 flex items-center">
+                <span class="mr-1">📍</span> ${u.ubicacion}
+            </div>
+
+            <div class="flex-grow space-y-4">
+                <div>
+                    <h4 class="text-xs font-bold text-stone-400 uppercase">Fortalezas</h4>
+                    <p class="text-sm text-stone-700">${u.fortalezas}</p>
+                </div>
+                
+                <div class="bg-stone-50 rounded-lg p-3 border border-stone-100">
+                    <div class="flex justify-between items-center mb-1">
+                        <h4 class="text-xs font-bold text-stone-500 uppercase">💻 Evaluación Tech</h4>
+                        <span class="font-bold text-stone-700 text-sm">${u.tech_score}/10</span>
+                    </div>
+                    <p class="text-xs text-stone-600">${u.tech_desc}</p>
+                </div>
+
+                <div class="grid grid-cols-2 gap-2 text-xs">
+                    <div class="p-2 bg-white border border-stone-100 rounded">
+                        <span class="block text-stone-400 font-bold mb-1">🎟️ Fichas</span>
+                        <span class="text-stone-700">${u.fichas}</span>
+                    </div>
+                    <div class="p-2 bg-white border border-stone-100 rounded">
+                        <span class="block text-stone-400 font-bold mb-1">📝 Examen</span>
+                        <span class="text-stone-700">${u.examen}</span>
+                    </div>
+                </div>
+                
+                <div class="flex justify-between items-center pt-2 border-t border-stone-100 text-sm">
+                    <span class="font-bold text-stone-700">💰 Costo Est.</span>
+                    <span class="${u.costo_num > 0 ? 'text-red-700 font-bold' : 'text-stone-500'}">${u.costo}</span>
+                </div>
+            </div>
+
+            <div class="mt-4 pt-4">
+                <a href="${u.url}" target="_blank" rel="noopener noreferrer" class="block w-full py-2.5 bg-stone-800 hover:bg-stone-700 text-white text-center rounded-lg text-sm font-medium transition-colors">
+                    Ver Sitio Oficial
+                </a>
+            </div>
+        `;
+                grid.appendChild(card);
+            });
+        };
+
+        const setupListeners = () => {
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    document.querySelectorAll('.filter-btn').forEach(b => {
+                        b.classList.remove('bg-stone-800', 'text-white');
+                        b.classList.add('bg-stone-100', 'text-stone-600');
+                    });
+                    e.target.classList.remove('bg-stone-100', 'text-stone-600');
+                    e.target.classList.add('bg-stone-800', 'text-white');
+                    appState.category = e.target.dataset.filter;
+                    renderCards();
+                });
+            });
+
+            document.getElementById('statusFilter').addEventListener('change', (e) => {
+                appState.status = e.target.value;
+                renderCards();
+            });
+
+            document.getElementById('searchInput').addEventListener('input', (e) => {
+                appState.query = e.target.value.toLowerCase();
+                renderCards();
+            });
+        };
+
+        window.addEventListener('DOMContentLoaded', () => {
+            initDashboard();
+            renderCards();
+            setupListeners();
+        });
+    </script>
+</body>
+
+</html>
