@@ -1,0 +1,23 @@
+ReferenceError: Chart is not defined
+    at initCharts (about:blank:104:5)
+    at about:blank:340:5
+    at callTheUserObjectsOperation (/home/boyfer/ws/mex-edu-info-2026/node_modules/jsdom/lib/generated/idl/EventListener.js:26:30)
+    at innerInvokeEventListeners (/home/boyfer/ws/mex-edu-info-2026/node_modules/jsdom/lib/jsdom/living/events/EventTarget-impl.js:360:16)
+    at invokeEventListeners (/home/boyfer/ws/mex-edu-info-2026/node_modules/jsdom/lib/jsdom/living/events/EventTarget-impl.js:296:3)
+    at DocumentImpl._dispatch (/home/boyfer/ws/mex-edu-info-2026/node_modules/jsdom/lib/jsdom/living/events/EventTarget-impl.js:243:9)
+    at fireAnEvent (/home/boyfer/ws/mex-edu-info-2026/node_modules/jsdom/lib/jsdom/living/helpers/events.js:18:36)
+    at dispatchEvent (/home/boyfer/ws/mex-edu-info-2026/node_modules/jsdom/lib/jsdom/living/nodes/Document-impl.js:528:9)
+    at /home/boyfer/ws/mex-edu-info-2026/node_modules/jsdom/lib/jsdom/living/nodes/Document-impl.js:533:11
+    at new Promise (<anonymous>)
+Calling selectState directly for NL!
+Caught error: TypeError: Cannot set properties of null (setting 'textContent')
+    at renderCards (about:blank:170:56)
+    at selectState (about:blank:278:5)
+    at /home/boyfer/ws/mex-edu-info-2026/tester.js:44:20
+    at callTheUserObjectsOperation (/home/boyfer/ws/mex-edu-info-2026/node_modules/jsdom/lib/generated/idl/EventListener.js:26:30)
+    at innerInvokeEventListeners (/home/boyfer/ws/mex-edu-info-2026/node_modules/jsdom/lib/jsdom/living/events/EventTarget-impl.js:360:16)
+    at invokeEventListeners (/home/boyfer/ws/mex-edu-info-2026/node_modules/jsdom/lib/jsdom/living/events/EventTarget-impl.js:296:3)
+    at EventTargetImpl._dispatch (/home/boyfer/ws/mex-edu-info-2026/node_modules/jsdom/lib/jsdom/living/events/EventTarget-impl.js:243:9)
+    at fireAnEvent (/home/boyfer/ws/mex-edu-info-2026/node_modules/jsdom/lib/jsdom/living/helpers/events.js:18:36)
+    at Document.<anonymous> (/home/boyfer/ws/mex-edu-info-2026/node_modules/jsdom/lib/jsdom/browser/Window.js:138:9)
+    at Document.callTheUserObjectsOperation (/home/boyfer/ws/mex-edu-info-2026/node_modules/jsdom/lib/generated/idl/EventListener.js:26:30)
